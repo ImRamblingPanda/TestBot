@@ -21,7 +21,6 @@ markup.add(item1, item2, item3, row_width=1)
 # функция кнопочного меню
 def startup(message):
     client.send_message(message.chat.id, "Привет, напиши \"меню\", чтобы вызвать его :)")
-    print(f"{message.text} {message.chat.first_name}")
 
 # обработчик сообщений
 @client.message_handler(content_types=['text', 'sticker'])
@@ -31,17 +30,14 @@ def msg_check(message):
     if isinstance(message.text, str) and message.text.lower() == "меню":
         client.send_message(message.chat.id, 'Выбери нужный рецепт и нажми на кнопку', reply_markup=markup)
     else: client.send_message(message.chat.id, 'Что-то ты не то написал :(')
-    print(f"{message.text} {message.chat.first_name}")
 # функционал 1 кнопки
 # кнопка 1: должна на вход спрашивать у пользователя номер телефона, после указания номера бот сооьщает: «приятно познакомиться»
 def phone_num(message):
     result = re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$', message.text)
     if result:
         client.send_message(message.chat.id, f'Приятно познакомиться, {message.chat.first_name}', reply_markup=markup)
-        print(f"{message.text} {message.chat.first_name}")
     else:
-        client.send_message(message.chat.id, 'По-моему ты где-то ошибся')
-        print(f"{message.text} {message.chat.first_name}")
+        client.send_message(message.chat.id, 'По-моему ты где-то ошибся, попробуй ещё раз')
         client.register_next_step_handler(message, phone_num)
 # функционал 2 кнопки
 # кнопка номер 2: бот задает вопрос: "мотоциклы" или "автомобили". На основе текстового ответа пользователя приходит последняя версия статьи с википедии об этом виде транспорта
@@ -85,12 +81,15 @@ def answer(call):
     client.answer_callback_query(callback_query_id=call.id)
     match call.data:
         case '1':
+            client.delete_message(call.message.chat.id, call.message.id)
             client.send_message(call.message.chat.id,'Привет, давай познакомимся, напиши мне свой номер в формате +7(999)-99-99 или похожем, чтоб я его понял :)')
             client.register_next_step_handler(call.message, phone_num)
         case '2':
+            client.delete_message(call.message.chat.id, call.message.id)
             client.send_message(call.message.chat.id,'Привет, напиши мне, что нравится больше автомобиль или мотоцикл, а я тебе ссылку на викистатью :)')
             client.register_next_step_handler(call.message, wikipedia)
         case '3':
+            client.delete_message(call.message.chat.id, call.message.id)
             client.send_message(call.message.chat.id, 'Привет, сообщи мне свой статус :)')
             client.register_next_step_handler(call.message, send_status)
 # ожидание ответа от сервера telegram
