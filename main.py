@@ -29,7 +29,7 @@ def msg_check(message):
     # проверка на тип сообщения
     if isinstance(message.text, str) and message.text.lower() == "меню":
         client.send_message(message.chat.id, 'Выбери нужный рецепт и нажми на кнопку', reply_markup=markup)
-    else: client.send_message(message.chat.id, 'Что-то ты не то написал :(')
+    else: client.send_message(message.chat.id, 'Хочешь начать? Напиши \"меню\"')
 # функционал 1 кнопки
 # кнопка 1: должна на вход спрашивать у пользователя номер телефона, после указания номера бот сооьщает: «приятно познакомиться»
 def phone_num(message):
