@@ -2,7 +2,6 @@ import os
 import re
 import telebot as tb
 from telebot import types
-from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 # инициализация бота
@@ -28,20 +27,24 @@ def startup(message):
 @client.message_handler(content_types=['text', 'sticker'])
 # функция вызова меню
 def msg_check(message):
+    # проверка на тип сообщения
     if isinstance(message.text, str) and message.text.lower() == "меню":
         client.send_message(message.chat.id, 'Выбери нужный рецепт и нажми на кнопку', reply_markup=markup)
-    else: client.send_message(message.chat.id, 'ты обосрался')
+    else: client.send_message(message.chat.id, 'Что-то ты не то написал :(')
     print(f"{message.text} {message.chat.first_name}")
+# функционал 1 кнопки
+# кнопка 1: должна на вход спрашивать у пользователя номер телефона, после указания номера бот сооьщает: «приятно познакомиться»
 def phone_num(message):
     result = re.match(r'^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$', message.text)
     if result:
-        client.send_message(message.chat.id, f'Привет, {message.chat.first_name}', reply_markup=markup)
+        client.send_message(message.chat.id, f'Приятно познакомиться, {message.chat.first_name}', reply_markup=markup)
         print(f"{message.text} {message.chat.first_name}")
     else:
         client.send_message(message.chat.id, 'По-моему ты где-то ошибся')
         print(f"{message.text} {message.chat.first_name}")
         client.register_next_step_handler(message, phone_num)
-
+# функционал 2 кнопки
+# кнопка номер 2: бот задает вопрос: "мотоциклы" или "автомобили". На основе текстового ответа пользователя приходит последняя версия статьи с википедии об этом виде транспорта
 def wikipedia(message):
     try:
         if re.match(r'мотоцикл|мотоциклы', message.text.lower()):
@@ -55,11 +58,11 @@ def wikipedia(message):
             client.register_next_step_handler(message.chat.id, wikipedia)
     except:
         client.send_message(message.chat.id, 'Ты не ответил на мой вопрос, попробуй ещё раз :(')
-
+# функционал 3 кнопки
+# кнопка номер 3 после ее нажатия бот спрашивает "статус" у пользователя. После того как пользователь ответил на сообщение, бот отправляет сообщение пользователя в другой канал
 def send_status(message):
     if isinstance(message.text, str):
         result = re.search((r'/'), message.text)
-        client.chat_member_handlers
         if not result:
             client.send_message('@tasty_testys',f'Статус {message.chat.first_name} - @{message.from_user.username} - {message.text}')
             check_member(message)
@@ -70,7 +73,7 @@ def send_status(message):
     else:
         client.send_message(message.chat.id, 'Ты ввел что-то не то, попробуй ещё раз')
         client.register_next_step_handler(message, send_status)
-
+# функция проверки наличия пользователя в чате
 def check_member(message):
     if client.get_chat_member(chat_id='@tasty_testys', user_id=message.from_user.id).status == 'left':
         client.send_message(message.chat.id,f'Я отправил твой статус, но тебя нет в чатике, лови ссылку - {client.create_chat_invite_link("@tasty_testys").invite_link}')
